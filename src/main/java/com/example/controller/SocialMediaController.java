@@ -2,6 +2,7 @@ package com.example.controller;
 
 import java.net.ResponseCache;
 import java.util.List;
+import java.util.Optional;
 
 import javax.naming.AuthenticationException;
 
@@ -48,46 +49,62 @@ public class SocialMediaController {
     
     @PostMapping("/register")
     public ResponseEntity<Integer> register(@RequestBody Account account) {
-        accountService.register(account);
-        return ResponseEntity.status(HttpStatus.CREATED).body(200);
+        if(accountService.findUsername(account.getUsername()) == false){
+            accountService.register(account);
+            return ResponseEntity.status(HttpStatus.OK).body(200);
+        }
+        else{
+            return ResponseEntity.status(409).body(409);
+        }
     }
 
     @PostMapping("/login")
-        public ResponseEntity<Void> login(@RequestBody Account account) throws AuthenticationException{
-            accountService.login(account.getUsername(), account.getPassword());
-            return ResponseEntity.noContent().header("username", account.getUsername()).build();
+        public ResponseEntity<Account> login(@RequestBody Account account) throws AuthenticationException{
+            if(accountService.login(account.getUsername(), account.getPassword()) != null){
+                return ResponseEntity.ok(accountService.login(account.getUsername(), account.getPassword()));
+            }
+            else{
+                return ResponseEntity.status(401).body(null);
+            }
         }
 
-    //@PostMapping("/messages")
+    @PostMapping("/messages")
+        public ResponseEntity<Message> createMessage(@RequestBody Message message){
+            messageService.createMessage(message);
+            if(messageService.createMessage(message) != null){
+                return ResponseEntity.ok(messageService.createMessage(message));
+            }
+            else{
+                return ResponseEntity.status(400).body(null);
+            }
+        }
         
-
     @GetMapping("/messages")
     public @ResponseBody List<Message> getMessages(){
         return messageService.getMessages();
     }
 
     @GetMapping("/messages/{messageID}")
-    public @ResponseBody ResponseEntity<Message> findMessageByID(@RequestParam Integer messageID){
-        return new ResponseEntity<>(messageService.findMessageByID(messageID), HttpStatus.ACCEPTED);
+    public @ResponseBody ResponseEntity<Optional<Message>> findMessageByID(@PathVariable Integer messageID){
+        return ResponseEntity.ok().body(messageService.findMessageByID(messageID));
     }
 
     @DeleteMapping("/messages/{messageID}")
     public @ResponseBody ResponseEntity<Integer> deleteMessageByID(@PathVariable Integer messageID){
         messageService.deleteMessageByID(messageID);
-        return ResponseEntity.accepted().body(200);
+        return ResponseEntity.ok(1);
     }
 
     @PatchMapping("/messages/{messageID}")
-    public @ResponseBody ResponseEntity<Integer> updateMessage(@RequestParam(defaultValue = "0", required = false) Integer messageID, 
+    public @ResponseBody ResponseEntity<Integer> updateMessage(@PathVariable Integer messageID, 
     @RequestBody Message message){
             messageService.updateMessageByID(messageID, message.getMessageText());
-            if(messageService.updateMessageByID(messageID, message.getMessageText()) == true){
+            if(messageService.updateMessageByID(messageID, message.getMessageText()) == true && !message.getMessageText().isEmpty()){
                 return ResponseEntity.ok(1);
             }
             else{
                 return ResponseEntity.status(400).body(null);
             }
-        
     } 
 
     //@GetMapping("/account/{accountId}")

@@ -20,16 +20,24 @@ public class MessageService {
         this.messageRepository = messageRepository;
     }
 
-    public void addMessage(Message message){
-        messageRepository.save(message);
+    public Message createMessage(Message message){
+        if(message.getMessageText().isBlank() || message.getMessageText().length() > 255){
+            return null;
+        }
+        else{
+            return messageRepository.save(message);
+        }
     }
 
     public List<Message> getMessages(){
         return messageRepository.findAll();
     }
     
-    public Message findMessageByID(Integer messageId){
-        Message message = messageRepository.findById(messageId).orElseThrow();
+    public Optional<Message> findMessageByID(Integer messageId){
+        Optional<Message> message = messageRepository.findById(messageId);
+        if(message.isEmpty()){
+            return null;
+        }
         return message;
     }
 

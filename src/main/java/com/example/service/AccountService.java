@@ -2,6 +2,7 @@ package com.example.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.naming.AuthenticationException;
 
@@ -22,10 +23,25 @@ public class AccountService {
     }
 
     public void register(Account newAccount){
-        accountRepository.save(newAccount);
+            accountRepository.save(newAccount);
     }
 
-    public void login(String username, String password) throws AuthenticationException {
-        accountRepository.findByUsernameAndPassword(username, password);
+    public Account login(String username, String password) throws AuthenticationException {
+        Account account = accountRepository.findByUsernameAndPassword(username, password);
+        if(account == null || !account.getPassword().equals(password)){
+            return null;
+        }
+        else{
+            return account;
+        }
+    }
+
+    public boolean findUsername(String username) {
+        if(accountRepository.findByUsername(username) != null){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 }
