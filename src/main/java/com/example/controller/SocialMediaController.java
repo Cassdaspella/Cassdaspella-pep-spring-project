@@ -91,14 +91,19 @@ public class SocialMediaController {
 
     @DeleteMapping("/messages/{messageID}")
     public @ResponseBody ResponseEntity<Integer> deleteMessageByID(@PathVariable Integer messageID){
-        messageService.deleteMessageByID(messageID);
-        return ResponseEntity.ok(1);
+        if(messageService.findMessageByID(messageID) == null){
+            return ResponseEntity.ok(null);
+        }
+        else{
+            messageService.deleteMessageByID(messageID);
+            return ResponseEntity.ok(1);
+        }
+        
     }
 
     @PatchMapping("/messages/{messageID}")
     public @ResponseBody ResponseEntity<Integer> updateMessage(@PathVariable Integer messageID, 
     @RequestBody Message message){
-            messageService.updateMessageByID(messageID, message.getMessageText());
             if(messageService.updateMessageByID(messageID, message.getMessageText()) == true && !message.getMessageText().isEmpty()){
                 return ResponseEntity.ok(1);
             }
@@ -107,8 +112,15 @@ public class SocialMediaController {
             }
     } 
 
-    //@GetMapping("/account/{accountId}")
-    //public @ResponseEntity List<Message> getMessagesByAccountId(@PathVariable Integer accountId){
-//
-    //}
+    @GetMapping("/account/{accountId}")
+    public @ResponseBody ResponseEntity<List<Message>> getMessagesByAccountId(@PathVariable Integer accountId){
+        List<Message> accountMessages = messageService.getMessagesByAccountId(accountId);
+        if(accountMessages == null){
+            return ResponseEntity.ok(null);
+        }
+        else{
+            return ResponseEntity.ok(accountMessages);
+        }
+        
+    }
 }
