@@ -61,8 +61,8 @@ public class MessageService {
         }
     }
 
-    public List<Message> getMessagesByAccountId(Integer postedBy){
-        List<Message> accountMessages = messageRepository.findByPostedBy(accountRepository.getById(postedBy));
+    public List<Message> findMessagesByAccountId(Integer postedBy){
+        List<Message> accountMessages = messageRepository.findByPostedBy(postedBy);
         if (accountMessages == null) {
             return null;
         } else {

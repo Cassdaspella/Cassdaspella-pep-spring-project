@@ -112,13 +112,13 @@ public class SocialMediaController {
             }
     } 
 
-    @GetMapping("/account/{accountId}")
-    public @ResponseBody ResponseEntity<List<Message>> getMessagesByAccountId(@PathVariable Integer accountId){
-        List<Message> accountMessages = messageService.getMessagesByAccountId(accountId);
-        if(accountMessages == null){
+    @GetMapping("/accounts/{accountId}/messages")
+    public @ResponseBody ResponseEntity<List<Message>> findMessagesByAccountId(@PathVariable Integer accountId){
+        List<Message> accountMessages = messageService.findMessagesByAccountId(accountId);
+        if (accountMessages == null) {
             return ResponseEntity.ok(null);
-        }
-        else{
+        } else {
+            messageService.findMessagesByAccountId(accountId);
             return ResponseEntity.ok(accountMessages);
         }
         
